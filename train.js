@@ -16,16 +16,17 @@ for (const imagePath of fs.readdirSync(imageDirPath)) {
 	const grayImage = sharp(imageBuffer).grayscale();
 	// Normalize the image so that the pixel values range from 0 to 1
 	const normalizedImage = grayImage.normalize();
-
+// console.log(normalizedImage)
 	// Resize the image to a fixed size
-	const resizedImage = normalizedImage.resize([28, 28]);
-
+	const resizedImage = normalizedImage.resize(28, 28);
+	start(resizedImage)
+	return
 	// Extract the pixel values from the image
 	const pixelValues = resizedImage.options.input.buffer
 	
 	// Convert the pixel values to numerical values
 	const numericalValues = pixelValues.map((v) => v / 255.0);
-console.log(numericalValues)
+// console.log(numericalValues)
 	// Get the label of the image
 	const label = imagePath.split("-")[1].split(".")[0];
 
@@ -35,3 +36,10 @@ console.log(numericalValues)
 
 // Save the training data to a CSV file
 fs.writeFileSync("training-data.csv", trainingData.join("\n"));
+
+
+async function start(image) {
+	fs.writeFileSync('./test.txt', JSON.stringify(await image.raw().toBuffer()))
+	let newImage = await image.raw().toBuffer()
+	console.log(newImage)
+}
