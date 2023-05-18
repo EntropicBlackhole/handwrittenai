@@ -1,7 +1,36 @@
 const fs = require("fs");
 const sharp = require("sharp");
-const NeuralNetwork = require("./neural_network.js");
+const { NeuralNetwork } = require("./neural_network.js");
+class Sigmoid {
+  forward(x) {
+    return 1 / (1 + Math.exp(-x));
+  }
 
+  backward(y) {
+    return y * (1 - y);
+  }
+}
+
+class ReLU {
+  forward(x) {
+    return Math.max(0, x);
+  }
+
+  backward(y) {
+    return y > 0 ? 1 : 0;
+  }
+}
+
+class Tanh {
+  forward(x) {
+    return Math.tanh(x);
+  }
+
+  backward(y) {
+    return 1 - y * y;
+  }
+}
+/*
 // Get the path to the image file
 const imagePath = "image.png";
 
@@ -22,26 +51,33 @@ const pixelValues = resizedImage.data;
 
 // Convert the pixel values to numerical values
 const numericalValues = pixelValues.map((v) => v / 255.0);
-
+*/
 // Create a new neural network
-const neuralNetwork = new NeuralNetwork(784, 10);
+// const nn = new NeuralNetwork([784, 128, 64, 10], [new ReLU(), new ReLU(), new Softmax()]);
+const neuralNetwork = new NeuralNetwork(784, 10, [3], new ReLU());
 
 // Train the neural network
-for (const trainingExample of fs.readFileSync("training-data.csv", "utf8").split("\n")) {
+const trainingData = fs.readFileSync("training-data.csv", "utf8");
+for (const trainingExample of trainingData.split("\n")) {
   // Split the training example into the input and the label
-  const [input, label] = trainingExample.split(",");
+  const trainingDataLine = trainingExample.split(",");
+  let label = trainingDataLine[trainingDataLine.length-1];
+  trainingDataLine.shift()
+  let input = JSON.parse(`[${trainingDataLine}]`)
 
   // Convert the input to a numerical value
-  const numericalInput = input.map((v) => v / 255.0);
+  // const numericalInput = input.map((v) => v / 255.0);
 
   // Feed the numerical input to the neural network
-  const prediction = neuralNetwork.predict(numericalInput);
+  const prediction = neuralNetwork.predict(input);
 
   // Calculate the loss
-  const loss = neuralNetwork.calculateLoss(prediction, label);
+  const oneHotLabel = oneHotEncode(label, 10);
+  const loss = neuralNetwork.calculateLoss(prediction, oneHotLabel);
+  // const loss = neuralNetwork.calculateLoss(prediction, label);
 
   // Update the neural network parameters
-  neuralNetwork.updateParameters(loss);
+  neuralNetwork.updateParameters(loss, input);
 }
 
 // Save the neural network
@@ -52,3 +88,12 @@ const prediction = neuralNetwork.predict(numericalValues);
 
 // Print the prediction
 console.log(prediction);
+
+function oneHotEncode(label, numClasses) {
+  const oneHot = [];
+  for (let i = 0; i < numClasses; i++) {
+    oneHot.push(i === label ? 1 : 0);
+  }
+  return oneHot;
+}
+
