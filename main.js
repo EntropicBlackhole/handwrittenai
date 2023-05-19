@@ -1,6 +1,6 @@
 const fs = require("fs");
 const sharp = require("sharp");
-const { NeuralNetwork } = require("./neural_network.js");
+const { NeuralNetwork } = require("./neural_network2.js");
 class Sigmoid {
   forward(x) {
     return 1 / (1 + Math.exp(-x));
