@@ -1,34 +1,40 @@
-const { NeuralNetwork } = require('./neural_network2')
-// Create a new neural network with 2 input layers, 1 hidden layer, and 1 output layer.
-const neuralNetwork = new NeuralNetwork(2, 1, 1, sigmoid, 0.01);
-
-// Create some training data.
-const trainingData = [
-	{
-		inputs: [1, 0],
-		outputs: [0]
-	},
-	{
-		inputs: [0, 1],
-		outputs: [1]
+function fermatTest(n, k) {
+	if (n <= 1) {
+		return false;
 	}
-];
 
-// Train the neural network.
-neuralNetwork.train(trainingData, 1000);
+	// Perform Fermat's primality test 'k' times
+	for (let i = 0; i < k; i++) {
+		// Generate a random number between 2 and n-1
+		const a = Math.floor(Math.random() * (n - 2)) + 2;
 
-// Make a prediction.
-const prediction = neuralNetwork.predict([1, 0]);
+		// Calculate a^(n-1) mod n
+		const result = modularExponentiation(a, n - 1, n);
 
-// Print the prediction.
-console.log(prediction, 'a'); // 0
+		// If the result is not 1, then 'n' is composite
+		if (result !== 1) {
+			return false;
+		}
+	}
 
-function sigmoid(x) {
-	let result = [];
+	// If 'n' passes the test 'k' times, it is likely prime
+	return true;
+}
 
-	for (let i = 0; i < x.length; i++) {
-		result.push(1 / (1 + Math.exp(-x[i])));
+// Function to perform modular exponentiation
+function modularExponentiation(base, exponent, modulus) {
+	let result = 1;
+	base = base % modulus;
+
+	while (exponent > 0) {
+		if (exponent % 2 === 1) {
+			result = (result * base) % modulus;
+		}
+
+		exponent = Math.floor(exponent / 2);
+		base = (base * base) % modulus;
 	}
 
 	return result;
 }
+console.log(fermat(2, 3))
