@@ -10,7 +10,7 @@ async function start() {
   const grayImage = sharp(imageBuffer).grayscale();
   
   const normalizedImage = grayImage.normalize();
-  const resizedImage = normalizedImage.resize(14, 14)
+  const resizedImage = normalizedImage.resize(28, 28)
   fs.writeFileSync('./test.png', await resizedImage.toBuffer())
   let imageBuffer2 = await resizedImage.raw().toBuffer()
   const pixelValues = JSON.parse(JSON.stringify(imageBuffer2)).data
